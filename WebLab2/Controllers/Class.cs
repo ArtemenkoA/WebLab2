@@ -15,7 +15,9 @@ namespace WebLab2.Controllers
         public ApplicationContext() => Database.EnsureCreated();
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite("Data Source=helloapp.db");
+            optionsBuilder.UseSqlite("Data Source=Details.db");
         }
     }
+
+  
 }
