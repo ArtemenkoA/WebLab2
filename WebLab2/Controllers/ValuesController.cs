@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+using Microsoft.EntityFrameworkCore;
 
 namespace WebLab2.Controllers
 {
@@ -8,54 +7,101 @@ namespace WebLab2.Controllers
     [ApiController]
     public class ValuesController : ControllerBase
     {
-        // GET: api/<ValuesController>
-        [HttpGet]
-        public IEnumerable<string> Get()
-        {
-            using (ApplicationContext db = new ApplicationContext())
-            {
-                Detail[] Details = new Detail[20];
-                for (int i = 0; i < Details.Length; i++)
-                {
-                    Details[i].Id = i+12;
-                    Details[i].Count = 36+i*2;
-                    Details[i].Adres = i+22;
-                }
-
-                for (int i = 0; i < Details.Length; i++)
-                {
-                    db.Details.Add(Details[i]);
-
-                }
-                db.SaveChanges();
-            }
-
-            return new string[] { "value1", "value2" };
-        }
-
         // GET api/<ValuesController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
+        [HttpGet]
+        public async Task<ActionResult<Detail>> Get([FromQuery] int id, [FromQuery] int count, [FromQuery] int adres)
         {
-            return "value";
+            List<Detail> Detail_list;
+            Detail Detail1 = new Detail();
+            using (var db = new ApplicationContext())
+            {
+                // получаем объекты из бд 
+                Detail_list = db.Details.ToList();
+
+                for (int i = 0; i < Detail_list.Count; i++)
+                {
+                    if (id == Detail_list[i].Id)
+                    {
+                        Detail1 = Detail_list[i];
+                    }
+
+                    else if (count == Detail_list[i].Count)
+                    {
+                        Detail1 = Detail_list[i];
+                    }
+
+                    else if (adres == Detail_list[i].Adres)
+                    {
+                        Detail1 = Detail_list[i];
+                    }
+                }
+            }
+            return new ObjectResult(Detail1);
         }
+
 
         // POST api/<ValuesController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public string Post(int id, int count, int adres)
         {
+            using (var db = new ApplicationContext())
+            {
+                Detail Detail1 = new Detail();
+                Detail1.Id = id;
+                Detail1.Count = count;
+                Detail1.Adres = adres;
+                db.Details.Add(Detail1);
+                db.SaveChanges();
+            }
+            return "success";
         }
 
         // PUT api/<ValuesController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public void Put(int id, [FromBody] int count)
         {
+            List<Detail> Detail_list;
+            Detail Detail1 = new Detail();
+            using (var db = new ApplicationContext())
+            {
+                // получаем объекты из бд 
+                Detail_list = db.Details.ToList();
+
+                for (int i = 0; i < Detail_list.Count; i++)
+                {
+                    if (id == Detail_list[i].Id)
+                    {
+                        Detail1.Id = Detail_list[i].Id;
+                        Detail1.Count = count;
+                    }
+                }
+                db.Details.Update(Detail1);
+                db.SaveChanges();
+            }
         }
 
         // DELETE api/<ValuesController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public string Delete(int id)
         {
+            List<Detail> Detail_list;
+            Detail Detail1 = new Detail();
+            using (var db = new ApplicationContext())
+            {
+                Detail_list = db.Details.ToList();
+
+                for (int i = 0; i < Detail_list.Count; i++)
+                {
+                    if (id == Detail_list[i].Id)
+                    {
+                        Detail1 = Detail_list[i];
+                    }
+                }
+
+                db.Details.Remove(Detail1);
+                db.SaveChanges();
+            }
+            return "success";
         }
     }
 }
