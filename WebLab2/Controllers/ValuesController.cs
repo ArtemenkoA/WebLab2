@@ -1,10 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using System.Data.Common;
+using System.Diagnostics;
 
 namespace WebLab2.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+
     public class ValuesController : ControllerBase
     {
         // GET api/<ValuesController>/5
@@ -56,27 +60,19 @@ namespace WebLab2.Controllers
             return "success";
         }
 
-        // PUT api/<ValuesController>/5
+        // PUT api/<ValuesController>/5 
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] int count)
+        public void Put(int id, [FromBody] DetailDTO detailDTO)
         {
-            List<Detail> Detail_list;
-            Detail Detail1 = new Detail();
             using (var db = new ApplicationContext())
             {
-                // получаем объекты из бд 
-                Detail_list = db.Details.ToList();
-
-                for (int i = 0; i < Detail_list.Count; i++)
+                var Detail = db.Details.FirstOrDefault(x => x.Id == id);
+                if (Detail != null)
                 {
-                    if (id == Detail_list[i].Id)
-                    {
-                        Detail1.Id = Detail_list[i].Id;
-                        Detail1.Count = count;
-                    }
+                    Detail.Adres = detailDTO.Adres;
+                    Detail.Count = detailDTO.Count;
+                    db.SaveChanges();
                 }
-                db.Details.Update(Detail1);
-                db.SaveChanges();
             }
         }
 
@@ -103,5 +99,12 @@ namespace WebLab2.Controllers
             }
             return "success";
         }
-    }
+
+        [HttpOptions]
+        
+        public void Opt() {
+        }
+        
+
+    } 
 }
