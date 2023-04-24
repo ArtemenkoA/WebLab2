@@ -40,13 +40,19 @@ namespace WebLab2.Controllers
                     }
                 }
             }
+            if (Detail1 != null)
+            {
+                return NotFound();
+            }
+            else
             return new ObjectResult(Detail1);
+
         }
 
 
         // POST api/<ValuesController>
         [HttpPost]
-        public string Post(int id, int count, int adres)
+        public async Task<ActionResult<Detail>> Post(int id, int count, int adres)
         {
             using (var db = new ApplicationContext())
             {
@@ -56,13 +62,13 @@ namespace WebLab2.Controllers
                 Detail1.Adres = adres;
                 db.Details.Add(Detail1);
                 db.SaveChanges();
+                return Ok();
             }
-            return "success";
         }
 
         // PUT api/<ValuesController>/5 
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] DetailDTO detailDTO)
+        public async Task<ActionResult<Detail>> Put(int id, [FromBody] DetailDTO detailDTO)
         {
             using (var db = new ApplicationContext())
             {
@@ -73,12 +79,20 @@ namespace WebLab2.Controllers
                     Detail.Count = detailDTO.Count;
                     db.SaveChanges();
                 }
+
+                if (Detail == null)
+                {
+                    return NotFound();
+                }
+                else
+                { return new ObjectResult(Detail); }
             }
+         
         }
 
         // DELETE api/<ValuesController>/5
         [HttpDelete("{id}")]
-        public string Delete(int id)
+        public async Task<ActionResult<Detail>> Delete(int id)
         {
             List<Detail> Detail_list;
             Detail Detail1 = new Detail();
@@ -92,18 +106,22 @@ namespace WebLab2.Controllers
                     {
                         Detail1 = Detail_list[i];
                     }
+                    else if (id == 0)
+                    {
+                        return NotFound();
+                    }
                 }
 
                 db.Details.Remove(Detail1);
                 db.SaveChanges();
+                return Ok();
             }
-            return "success";
         }
 
         [HttpOptions]
         public ActionResult Options()
         {
-            HttpContext.Response.Headers.Add("Allow", "GET, POST, OPTIONS, GET, PUT, DELETE");
+            HttpContext.Response.Headers.Add("Allow", "GET, POST, OPTIONS, PUT, DELETE");
             return StatusCode(405);
         }
 
