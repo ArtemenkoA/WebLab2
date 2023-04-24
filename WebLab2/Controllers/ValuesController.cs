@@ -101,10 +101,12 @@ namespace WebLab2.Controllers
         }
 
         [HttpOptions]
-        
-        public void Opt() {
+        public ActionResult Options()
+        {
+            HttpContext.Response.Headers.Add("Allow", "GET, POST, OPTIONS, GET, PUT, DELETE");
+            return StatusCode(405);
         }
-        
+
 
     } 
 }
